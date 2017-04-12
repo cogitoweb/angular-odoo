@@ -14,7 +14,7 @@ angular.module('odoo').provider('jsonRpc', function jsonRpcProvider() {
 
 	var preflightPromise = null;
 
-	this.$get = ["$http", "$q", "$timeout", function($http, $q, $timeout) {
+	this.$get = ["$http", "$q", "$timeout", '$rootScope', '$state', function($http, $q, $timeout, $rootScope, $state) {
 
 		var odooRpc = this.odooRpc;
 
@@ -261,6 +261,7 @@ angular.module('odoo').provider('jsonRpc', function jsonRpcProvider() {
 			*		if error : reject with a custom errorObj
 			*/
 			function handleOdooErrors(response) {
+				$rootScope.loading--;
 				if (!response.data.error)
 					return response.data;
 
@@ -274,6 +275,9 @@ angular.module('odoo').provider('jsonRpc', function jsonRpcProvider() {
 				if (error.code === 200 && error.message === "Odoo Server Error" && error.data.name === "werkzeug.exceptions.NotFound") {
 					errorObj.title = 'page_not_found';
 					errorObj.message = 'HTTP Error';
+
+					window.localStorage.clear();
+					$state.go('login');
 				} else if ( (error.code === 100 && error.message === "Odoo Session Expired") || //v8
 							(error.code === 300 && error.message === "OpenERP WebClient Error" && error.data.debug.match("SessionExpiredException")) //v7
 						) {
@@ -325,6 +329,7 @@ angular.module('odoo').provider('jsonRpc', function jsonRpcProvider() {
 			*/
 			function http(url, params) {
 				var req = buildRequest(url, params);
+				$rootScope.loading++;
 				return $http(req).then(handleOdooErrors, handleHttpErrors);
 			}
 
