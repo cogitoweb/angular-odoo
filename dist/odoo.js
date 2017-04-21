@@ -220,6 +220,18 @@ angular.module('odoo').provider('jsonRpc', function jsonRpcProvider() {
 			return odooRpc.sendRequest('/web/dataset/call_kw', params);
 		};
 
+		odooRpc.callButton = function(model, method, args, context_id, domain_id) {
+
+			var params = {
+				model: model,
+				method: method,
+				args: args,
+				context_id: context_id,
+				domain_id: domain_id
+			};
+			return odooRpc.sendRequest('/web/dataset/call_button', params);
+		};
+
 
 		/**
 		* base function
