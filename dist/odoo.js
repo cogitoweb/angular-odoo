@@ -277,6 +277,7 @@ angular.module('odoo').provider('jsonRpc', function jsonRpcProvider() {
 					errorObj.title = 'page_not_found';
 					errorObj.message = 'HTTP Error';
 
+					console.log('page not found');
 					window.localStorage.clear();
 					$state.go('login');
 				} else if ( (error.code === 100 && error.message === "Odoo Session Expired") || //v8
