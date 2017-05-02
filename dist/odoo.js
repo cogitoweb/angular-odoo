@@ -215,7 +215,7 @@ angular.module('odoo').provider('jsonRpc', function jsonRpcProvider() {
 				model: model,
 				method: method,
 				args: args,
-				kwargs: kwargs,
+				kwargs: kwargs
 			};
 			return odooRpc.sendRequest('/web/dataset/call_kw', params);
 		};
@@ -297,6 +297,9 @@ angular.module('odoo').provider('jsonRpc', function jsonRpcProvider() {
 						) {
 							errorObj.title ='session_expired';
 							cookies.delete_sessionId();
+
+							window.localStorage.clear();
+							$state.go('login');
 				} else if ( (error.message === "Odoo Server Error" && /FATAL:  database "(.+)" does not exist/.test(error.data.message))) {
 					errorObj.title = "database_not_found";
 					errorObj.message = error.data.message;
