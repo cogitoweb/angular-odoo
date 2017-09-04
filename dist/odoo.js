@@ -290,16 +290,14 @@ angular.module('odoo').provider('jsonRpc', function jsonRpcProvider() {
 					errorObj.message = 'HTTP Error';
 
 					console.log('page not found');
-					window.localStorage.clear();
-					$state.go('login');
+					$rootScope.$broadcast('session_expired');
 				} else if ( (error.code === 100 && error.message === "Odoo Session Expired") || //v8
 							(error.code === 300 && error.message === "OpenERP WebClient Error" && error.data.debug.match("SessionExpiredException")) //v7
 						) {
 							errorObj.title ='session_expired';
 							cookies.delete_sessionId();
 
-							window.localStorage.clear();
-							$state.go('login');
+							$rootScope.$broadcast('session_expired');
 				} else if ( (error.message === "Odoo Server Error" && /FATAL:  database "(.+)" does not exist/.test(error.data.message))) {
 					errorObj.title = "database_not_found";
 					errorObj.message = error.data.message;
@@ -365,7 +363,7 @@ angular.module('odoo').provider('jsonRpc', function jsonRpcProvider() {
 			function preflight() {
 				//preflightPromise is a kind of cache and is set only if the request succeed
 				return preflightPromise || http('/web/webclient/version_info', {}).then(function (reason) {
-					odooRpc.shouldManageSessionId = (reason.result.server_serie < "8"); //server_serie is string like "7.01"
+					odooRpc.shouldManageSessionId = (parseFloat(reason.result.server_serie) >= 8 && parseFloat(reason.result.server_serie) < 10); //server_serie is string like "7.01"
 					preflightPromise = $q.when(); //runonce
 				});
 			}
