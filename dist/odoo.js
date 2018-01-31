@@ -18,6 +18,39 @@ angular.module('odoo').provider('jsonRpc', function jsonRpcProvider() {
 
 		var odooRpc = this.odooRpc;
 
+		var processLoginResponse = function(result) {
+			if (!result.uid) {
+				cookies.delete_sessionId();
+				return $q.reject({ 
+					title: 'wrong_login',
+					message:"Username and password don't match",
+					fullTrace: result
+				});
+			}
+			odooRpc.context = result.user_context;
+			cookies.set_sessionId(result.session_id);
+			return result;
+		}
+
+		/**
+		* simpleLogin
+		*		update cookie (session_id) in both cases
+		* @return promise
+		*		resolve promise if credentials ok
+		*		reject promise if credentials ko (with {title: wrong_login})
+		*		reject promise in other cases (http issues, server error)   
+		*/
+		odooRpc.simpleLogin = function(db, pin) {
+			var params = {
+				db: db,
+				pin: pin
+			};
+
+			return odooRpc.sendRequest('/web/session/authenticate_pin', params).then(function(result) {
+				return processLoginResponse(result);
+			});
+		};
+
 		/**
 		* login
 		*		update cookie (session_id) in both cases
@@ -34,17 +67,7 @@ angular.module('odoo').provider('jsonRpc', function jsonRpcProvider() {
 			};
 
 			return odooRpc.sendRequest('/web/session/authenticate', params).then(function(result) {
-				if (!result.uid) {
-					cookies.delete_sessionId();
-					return $q.reject({ 
-						title: 'wrong_login',
-						message:"Username and password don't match",
-						fullTrace: result
-					});
-				}
-				odooRpc.context = result.user_context;
-				cookies.set_sessionId(result.session_id);
-				return result;
+				return processLoginResponse(result);
 			});
 		};
 
