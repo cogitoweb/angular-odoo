@@ -125,13 +125,14 @@ angular.module('odoo').provider('jsonRpc', function jsonRpcProvider() {
             return $q.when();
         };
 
-        odooRpc.searchRead = function(model, domain, fields, context, limit) {
+        odooRpc.searchRead = function(model, domain, fields, context, limit, sort) {
             var params = {
                 model: model,
                 domain: domain,
                 fields: fields,
                 context: context,
-                limit: limit
+                limit: limit,
+                sort: sort,
             }
             return odooRpc.sendRequest('/web/dataset/search_read', params);
         };
