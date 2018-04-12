@@ -310,7 +310,7 @@ angular.module('odoo').provider('jsonRpc', function jsonRpcProvider() {
                 var headers = {
                     'Content-Type': 'application/json',
                     'X-Openerp-Session-Id': cookies.get_sessionId(),
-                    'X-Jit40-request-id': request_id
+                    'X-Jit40-Request-Id': request_id
                 };
                 return {
                     'method': 'POST',
