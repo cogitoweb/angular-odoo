@@ -8,7 +8,8 @@ angular.module('odoo').provider('jsonRpc', function jsonRpcProvider() {
         uniq_id_counter: 0,
         context: {'lang': 'fr_FR'},
         shouldManageSessionId: false, //try without first
-        errorInterceptors: []
+        errorInterceptors: [],
+        authorization: ""
     };
 
     var preflightPromise = null;
@@ -50,7 +51,7 @@ angular.module('odoo').provider('jsonRpc', function jsonRpcProvider() {
             odooRpc.context = result.user_context;
             cookies.set_sessionId(result.session_id);
             return result;
-        }
+        };
 
         /**
          * simpleLogin
@@ -312,6 +313,9 @@ angular.module('odoo').provider('jsonRpc', function jsonRpcProvider() {
                     'X-Openerp-Session-Id': cookies.get_sessionId(),
                     'X-Jit40-Request-Id': request_id
                 };
+                if(odooRpc.authorization !== "") {
+                    headers['Authorization'] = odooRpc.authorization;
+                }
                 return {
                     'method': 'POST',
                     'url': odooRpc.odoo_server + url,
@@ -423,6 +427,8 @@ angular.module('odoo').provider('jsonRpc', function jsonRpcProvider() {
                     preflightPromise = http(url_version_info, {}).then(function (reason) {
                         odooRpc.shouldManageSessionId = (parseFloat(reason.result.server_serie) > 8 && parseFloat(reason.result.server_serie) < 10); //server_serie is string like "7.01"
                         preflightPromise = $q.when(); //runonce
+                    }, function() {
+                        preflightPromise = null;
                     });
                 }
                 return preflightPromise;
