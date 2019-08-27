@@ -456,7 +456,9 @@ angular.module('odoo').provider('jsonRpc', function jsonRpcProvider() {
         return {
             delete_sessionId: function () {
                 session_id = null;
-                document.cookie = 'session_id=; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+                document.cookie = 'session_id=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+                // TODO delete on next release
+                document.cookie = 'session_id=; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
             },
             get_sessionId: function () {
                 return document.cookie.split('; ')
@@ -469,7 +471,7 @@ angular.module('odoo').provider('jsonRpc', function jsonRpcProvider() {
                     .pop() || session_id || "";
             },
             set_sessionId: function (val) {
-                document.cookie = 'session_id=' + val;
+                document.cookie = 'session_id=' + val + '; path=/';
                 session_id = val;
             }
         };
